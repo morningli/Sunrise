@@ -20,7 +20,7 @@ func HandleSend(conn *connection.ConnData) {
 
 			fmt.Println("发送给客户端的数据:", data)
 
-			payload, err := message.PackNetData(data)
+			payload, err := message.GetSimpleMessageInstance().EnCode(data)
 			if err != nil {
 				fmt.Println(err)
 				continue
@@ -63,7 +63,7 @@ func HandleConn(conn net.Conn) {
 	go HandleSend(&connData)
 
 	data := make([]byte, 1024)
-	check := message.CheckDataArride()
+	check := message.CheckDataArride(message.GetSimpleMessageInstance())
 	for {
 		i, err := connData.GetConnHandler().Read(data)
 		if err != nil {
@@ -72,7 +72,7 @@ func HandleConn(conn net.Conn) {
 		}
 
 		//校验数据是否完整
-		request, ok := check(data, i).(protocol.Protocol)
+		request, ok := check(data[:i]).(protocol.Protocol)
 		fmt.Println("客户端发来数据:", request)
 
 		if ok {

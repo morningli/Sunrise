@@ -80,3 +80,14 @@ func Convert(b []byte) string {
 	}
 	return strings.Join(s, "")
 }
+
+func Merge(src1 []byte, src2 []byte) []byte {
+	tmp := make([]byte, len(src1)+len(src2))
+	copy(tmp, src1)
+	copy(tmp[len(src1):], src2)
+	return tmp
+}
+
+func Remove(src []byte, l int) []byte {
+	return src[l:]
+}
