@@ -29,8 +29,10 @@ public class TcpManager : MonoBehaviour {
 	void Awake(){  
 		//初始化网络连接
 		connections.Add("default", new TcpClient());
-		//connections ["default"].init ("192.168.0.104", 8888);
-		connections ["default"].init ("119.29.174.231", 8888);
+		connections ["default"].init ("127.0.0.1", 8888);
+		//connections ["default"].init ("119.29.174.231", 8888);
+		connections.Add("sence", new TcpClient());
+		connections ["sence"].init ("127.0.0.1", 8888);
 
 		print ("awake.socket init");
 	}  

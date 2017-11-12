@@ -38,7 +38,7 @@ public class RoomInfo : MonoBehaviour {
 		protocol.request = JsonConvert.SerializeObject (request);
 					
 		SignalModule.FuncWithParam1<string> callback = EnterSence;
-		TcpManager.Instance.SendAndRecieve (JsonConvert.SerializeObject(protocol), callback);
+		TcpManager.Instance.SendAndRecieve (JsonConvert.SerializeObject(protocol), callback, "sence");
 	}
 
 	public void EnterSence(string respone)

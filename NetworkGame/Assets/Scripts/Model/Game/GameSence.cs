@@ -5,10 +5,12 @@ using Newtonsoft.Json;
 using System;
 
 public class GameSence : MonoBehaviour {
+	
 	void Awake()
 	{
 		Global.SceneAwake();
 	}
+
 	// Use this for initialization
 	void Start () {
 		Global.SceneStart();
