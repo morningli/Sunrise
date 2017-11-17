@@ -117,28 +117,22 @@
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/UnityVR/RuntimeEditor/UnityEngine.VR.dll</HintPath>
  </Reference>
  <Reference Include="ICSharpCode.SharpZipLib">
- <HintPath>E:/Workspace/NetworkGame/Assets/Outlib/ICSharpCode.SharpZipLib.dll</HintPath>
+ <HintPath>D:/工作站/贪吃蛇/NetworkGame/Assets/Outlib/ICSharpCode.SharpZipLib.dll</HintPath>
  </Reference>
  <Reference Include="DOTween">
- <HintPath>E:/Workspace/NetworkGame/Assets/Outlib/DOTween/DOTween.dll</HintPath>
+ <HintPath>D:/工作站/贪吃蛇/NetworkGame/Assets/Outlib/DOTween/DOTween.dll</HintPath>
  </Reference>
  <Reference Include="DOTween43">
- <HintPath>E:/Workspace/NetworkGame/Assets/Outlib/DOTween/DOTween43.dll</HintPath>
+ <HintPath>D:/工作站/贪吃蛇/NetworkGame/Assets/Outlib/DOTween/DOTween43.dll</HintPath>
  </Reference>
  <Reference Include="DOTween46">
- <HintPath>E:/Workspace/NetworkGame/Assets/Outlib/DOTween/DOTween46.dll</HintPath>
+ <HintPath>D:/工作站/贪吃蛇/NetworkGame/Assets/Outlib/DOTween/DOTween46.dll</HintPath>
  </Reference>
  <Reference Include="DOTween50">
- <HintPath>E:/Workspace/NetworkGame/Assets/Outlib/DOTween/DOTween50.dll</HintPath>
+ <HintPath>D:/工作站/贪吃蛇/NetworkGame/Assets/Outlib/DOTween/DOTween50.dll</HintPath>
  </Reference>
  <Reference Include="Newtonsoft.Json">
- <HintPath>E:/Workspace/NetworkGame/Assets/UnityPackages/JsonNet-Lite/Newtonsoft.Json.dll</HintPath>
- </Reference>
- <Reference Include="UnityEditor.iOS.Extensions.Xcode">
- <HintPath>C:/Program Files/Unity/Editor/Data/PlaybackEngines/iOSSupport/UnityEditor.iOS.Extensions.Xcode.dll</HintPath>
- </Reference>
- <Reference Include="UnityEditor.iOS.Extensions.Common">
- <HintPath>C:/Program Files/Unity/Editor/Data/PlaybackEngines/iOSSupport/UnityEditor.iOS.Extensions.Common.dll</HintPath>
+ <HintPath>D:/工作站/贪吃蛇/NetworkGame/Assets/UnityPackages/JsonNet-Lite/Newtonsoft.Json.dll</HintPath>
  </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

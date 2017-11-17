@@ -13,9 +13,11 @@ import (
 
 func HandleSend(conn *connection.ConnData) {
 	for {
-		select {
-		case <-conn.GetShutdownSignal():
+		if conn.IsClose() {
+			fmt.Println("链接已关闭(in HandleSend)")
 			break
+		}
+		select {
 		case data := <-conn.GetSendQueue():
 
 			fmt.Println("发送给客户端的数据:", data)
@@ -25,8 +27,7 @@ func HandleSend(conn *connection.ConnData) {
 				fmt.Println(err)
 				continue
 			}
-			//fmt.Printf("payload:%s\n", string(payload[:]))
-			conn.GetConnHandler().Write(payload)
+			conn.Write(payload)
 		}
 	}
 }
@@ -59,13 +60,17 @@ func HandleConn(conn net.Conn) {
 
 	//释放链接
 	defer online.RemoveConnection(seq)
-	defer func() { connData.GetShutdownSignal() <- true }()
 	go HandleSend(&connData)
 
 	data := make([]byte, 1024)
 	check := message.CheckDataArride(message.GetSimpleMessageInstance())
 	for {
-		i, err := connData.GetConnHandler().Read(data)
+		if connData.IsClose() {
+			fmt.Println("链接已关闭(in HandleConn)")
+			break
+		}
+
+		i, err := connData.Read(data)
 		if err != nil {
 			fmt.Println("读取客户端数据错误:", err.Error())
 			break

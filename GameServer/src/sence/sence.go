@@ -11,6 +11,7 @@ type Sence interface {
 	//场景控制///////////
 	Init(senceid string)
 	Run()
+	Close()
 	Destroy()
 
 	//玩家操作///////////

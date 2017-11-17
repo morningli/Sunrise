@@ -2,64 +2,80 @@
 package connection
 
 import (
-	//"fmt"
+	"fmt"
+	"io"
 	"net"
 	"protocol"
 )
 
 type ConnData struct {
-	Handler    net.Conn
-	SendQueue  chan protocol.Protocol
-	Shutdown   chan bool
-	SendSeq    uint32
-	RecieveSeq uint32
+	handler     net.Conn
+	send_queue  chan protocol.Protocol
+	is_close    bool
+	send_seq    uint32
+	recieve_seq uint32
 }
 
-func (conn *ConnData) SendRequestWithSeq(seq uint32, request protocol.Protocol) {
+func CreateConnData(self net.Conn) *ConnData {
+	data := new(ConnData)
+	data.handler = self
+	data.send_queue = make(chan protocol.Protocol, 100)
+	data.is_close = false
+	data.recieve_seq = 1
+	return data
+}
+
+func (self *ConnData) SendRequestWithSeq(seq uint32, request protocol.Protocol) {
 	go func() {
-		//fmt.Println("enter SendRequest")
 		request.Seq = seq
-		//fmt.Println(request)
-		conn.SendQueue <- request
+		self.send_queue <- request
 	}()
 }
 
-func (conn *ConnData) SendRequest(request protocol.Protocol) {
-	seq := conn.GetSendSeq()
-	conn.SendRequestWithSeq(seq, request)
+func (self *ConnData) Read(b []byte) (int, error) {
+	n, err := self.handler.Read(b)
+	if err != nil && err != io.EOF {
+		self.is_close = true
+	}
+	return n, err
 }
 
-func (conn *ConnData) SetRecieveSeq(seq uint32) {
-	if seq > conn.SendSeq {
-		conn.SendSeq = seq
+func (self *ConnData) Write(b []byte) (int, error) {
+
+	n, err := self.handler.Write(b)
+	if err != nil && err != io.EOF {
+		self.is_close = true
+	}
+	return n, err
+}
+
+func (self *ConnData) SendRequest(request protocol.Protocol) {
+	seq := self.GetSendSeq()
+	self.SendRequestWithSeq(seq, request)
+}
+
+func (self *ConnData) SetRecieveSeq(seq uint32) {
+	if seq > self.send_seq {
+		self.send_seq = seq
 	}
 }
 
-func (conn *ConnData) GetSendSeq() uint32 {
-	conn.SendSeq++
-	return conn.SendSeq
+func (self *ConnData) GetSendSeq() uint32 {
+	self.send_seq++
+	return self.send_seq
 }
 
-func (conn *ConnData) GetConnHandler() net.Conn {
-	return conn.Handler
+func (self *ConnData) GetSendQueue() chan protocol.Protocol {
+	return self.send_queue
 }
 
-func (conn *ConnData) GetSendQueue() chan protocol.Protocol {
-	return conn.SendQueue
+func (self *ConnData) IsClose() bool {
+	fmt.Println("is close:", self.is_close)
+	return self.is_close
 }
 
-func (conn *ConnData) GetShutdownSignal() chan bool {
-	return conn.Shutdown
-}
-
-func (conn *ConnData) Close() {
-	conn.Handler.Close()
-	close(conn.SendQueue)
-}
-
-func CreateConnData(conn net.Conn) *ConnData {
-	data := new(ConnData)
-	data.Handler = conn
-	data.SendQueue = make(chan protocol.Protocol, 100)
-	return data
+func (self *ConnData) Close() {
+	self.is_close = true
+	self.handler.Close()
+	close(self.send_queue)
 }

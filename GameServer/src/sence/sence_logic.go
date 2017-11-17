@@ -21,6 +21,7 @@ const (
 
 const (
 	Millisecond_interval = 30
+	SenceTimeMax         = 1000 * 60 * 10 / Millisecond_interval
 )
 
 func ConvertCharater(player *character.Character) protocol.PlayerStatus {
@@ -80,6 +81,12 @@ func (sence_info *SenceInfo) GetPlayerNum() int {
 
 func (sence_info *SenceInfo) AddAction(action protocol.Protocol) {
 	sence_info.action_queue <- action
+}
+
+func (sence_info *SenceInfo) Close() {
+	sence_info.status = SenceStatus_Close
+	//广播结束消息
+	sence_info.Broadcast(sence_info.GetEndRequest())
 }
 
 func (sence_info *SenceInfo) Destroy() {
@@ -313,9 +320,7 @@ func (sence_info *SenceInfo) Event() {
 	}
 	//游戏结束条件:玩家数为1时游戏结束
 	if len(sence_info.players) == 1 {
-		sence_info.status = SenceStatus_Close
-		//广播结束消息
-		sence_info.Broadcast(sence_info.GetEndRequest())
+		sence_info.Close()
 	}
 
 }
@@ -377,6 +382,21 @@ func (sence_info *SenceInfo) Update() {
 	}
 }
 
+func (sence_info *SenceInfo) CheckPlayerActive() bool {
+	for _, conn := range sence_info.conns {
+		var conn_data connection.ConnData
+		err := online.GetConnection(conn, &conn_data)
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+		if !conn_data.IsClose() {
+			return true
+		}
+	}
+	return false
+}
+
 func (sence_info *SenceInfo) Run() {
 	sence_info.status = SenceStatus_Active
 	ticker := time.NewTicker(time.Millisecond * Millisecond_interval)
@@ -384,10 +404,25 @@ func (sence_info *SenceInfo) Run() {
 	//推送队列
 	//时钟
 	go func() {
+
+		defer sence_info.Destroy()
+
 		//推送开始消息
 		sence_info.Broadcast(sence_info.GetStartRequest())
+		//游戏周期（限制游戏时间）
+		for sence_info.time = uint32(0); sence_info.time < SenceTimeMax; sence_info.time++ {
+			//如果所有玩家离线则游戏结束
+			active := sence_info.CheckPlayerActive()
+			if !active {
+				fmt.Println("所有玩家已经离线。房间号：", sence_info.id)
+				sence_info.Close()
+			}
 
-		for sence_info.time = uint32(0); ; sence_info.time++ {
+			if sence_info.IsClose() {
+				fmt.Println("退出场景运行。房间号：", sence_info.id)
+				break
+			}
+
 			//fmt.Println("star new tick")
 			select {
 			case <-ticker.C:
@@ -406,6 +441,7 @@ func (sence_info *SenceInfo) Run() {
 				}
 			}
 		}
+		sence_info.Close()
 	}()
 	sence_info.status = SenceStatus_Active
 }
